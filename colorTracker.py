@@ -138,13 +138,15 @@ while True:
     # Look through all the seperate contours and highlight the boundry and centroid
     for cnt in contours:
 		# Calculate moments
-        moments = cv2.moments(cnt)      
+        moments = cv2.moments(cnt)   
+        # maximum error:   
         controller.error = nx                    
         if moments['m00']!=0:
             x = int(moments['m10']/moments['m00'])
             y = int(moments['m01']/moments['m00'])
             print 'Center of Mass = ', '(', x, ', ', y, ')'
             
+            # get the error from the center width:
             controller.error = x - (nx/2)
             
             # draw contours 
@@ -156,15 +158,16 @@ while True:
     
     cv2.waitKey(10)
     
+    # send the error to controller
     e.put(controller)
 
-    while(1):		# Update rate of 10Hz
+    while(1):		# Update rate of 10Hz wait until 0.1 sim time passed
 		[status, framesize] = t.get(tim, wait=True, last=True)
 		if ( (tim.sim[0] - tic) >= Ts ):
 			print 'delta T = ', tim.sim[0] - tic
 			break
  
-    
+    # write to CSV file
     writer.writerow( (tic, controller.error) )
 #-----------------------------------------------------
 #--------[ Do not edit below ]------------------------

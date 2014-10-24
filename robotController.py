@@ -83,9 +83,9 @@ i=0
 errorWindow = collections.deque(maxlen = 25)
 errorWindow.append(0)
 Kp = 1
-Ki = 2.2
+Ki = 1
 oldError = 0
-Kd = .45
+Kd = .2
 
 print '======================================'
 print '============= Robot-View ============='
@@ -99,7 +99,9 @@ while True:
 	maxError = width/2.0
 	print 'Error = ', error
 	
+	# normalize error so that +/- 320 error is +/-1
 	errorNorm = abs(error) / maxError
+	
 	# Proportional Controller:
 	Sp = errorNorm * Kp
 	# Integral Controller:
@@ -110,6 +112,7 @@ while True:
 	Sd = ( (errorNorm - oldError) / .1 ) * Kd
 	oldError = errorNorm
 	
+	# sum them up and if more than 1, set to 1
 	Speed = Sp + Si + Sd
 	if (Speed > 1):
 		Speed = 1
@@ -126,9 +129,10 @@ while True:
 		ref.ref[1] = Speed
 	else:								# No Object, Searching for it
 		print 'No Object, Searching for it'
-		ref.ref[0] = -.2
-		ref.ref[1] = .2
-		
+		ref.ref[0] = -.5
+		ref.ref[1] = .5
+	
+	# control the robot	
 	r.put(ref);
 #-----------------------------------------------------
 #--------[ Do not edit below ]------------------------
